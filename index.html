@@ -17,6 +17,9 @@
         .menu-btn { border: none; color: white; padding: 15px 20px; text-align: left; font-size: 16px; font-weight: 600; cursor: pointer; border-radius: 8px; margin-bottom: 15px; transition: all 0.3s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
         
         /* Dashboard Button Colors */
+        .btn-color-home { background: linear-gradient(135deg, #34495e, #2c3e50); }
+        .btn-color-home:hover, .btn-color-home.active { background: linear-gradient(135deg, #2c3e50, #34495e); transform: scale(1.05); box-shadow: 0 6px 12px rgba(44, 62, 80, 0.4); }
+
         .btn-color-1 { background: linear-gradient(135deg, #1abc9c, #16a085); }
         .btn-color-1:hover, .btn-color-1.active { background: linear-gradient(135deg, #16a085, #1abc9c); transform: scale(1.05); box-shadow: 0 6px 12px rgba(26, 188, 156, 0.4); }
         
@@ -29,7 +32,7 @@
         .btn-color-4 { background: linear-gradient(135deg, #e67e22, #d35400); }
         .btn-color-4:hover, .btn-color-4.active { background: linear-gradient(135deg, #d35400, #e67e22); transform: scale(1.05); box-shadow: 0 6px 12px rgba(230, 126, 34, 0.4); }
         
-        /* Main Content */
+        /* Main Content & Sections (Fixed Display Issue) */
         .main-content { flex-grow: 1; padding: 30px; overflow-y: auto; }
         .section { display: none; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         .section.active { display: block; animation: fadeIn 0.4s ease; }
@@ -37,11 +40,12 @@
         
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Welcome Screen Styling */
-        .welcome-container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 80vh; text-align: center; background: none; box-shadow: none; }
-        .welcome-container h1 { font-size: 3.5rem; color: #2c3e50; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
-        .welcome-container h1 span { color: #3498db; }
-        .welcome-container p { font-size: 1.2rem; color: #7f8c8d; }
+        /* Welcome Screen Styling - Fixed to Only Show When Active */
+        #welcome-screen { background: none; box-shadow: none; height: 80vh; }
+        #welcome-screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        #welcome-screen h1 { font-size: 3.5rem; color: #2c3e50; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
+        #welcome-screen h1 span { color: #3498db; }
+        #welcome-screen p { font-size: 1.2rem; color: #7f8c8d; }
 
         /* Forms & Inputs */
         .form-group { margin-bottom: 15px; }
@@ -64,7 +68,7 @@
         .att-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .att-info { display: flex; align-items: center; gap: 15px; }
         .att-info img { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 2px solid #ecf0f1; }
-        .att-actions { display: flex; gap: 5px; flex-wrap: wrap; }
+        .att-actions { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; }
         
         /* Colorful Attendance Buttons */
         .btn-att { padding: 10px 14px; border: 1px solid transparent; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.2s; }
@@ -99,6 +103,17 @@
         /* Top Bar Filters */
         .top-filter { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #ecf0f1; padding: 15px; border-radius: 8px; border-left: 5px solid #3498db; }
         .export-btns button { margin-left: 10px; }
+
+        /* Toast Popup Styles */
+        .toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: white; border-left: 6px solid #2ecc71; color: #333; padding: 15px 20px; border-radius: 8px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 15px; min-width: 260px; animation: slideIn 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55), fadeOut 0.3s ease 1.7s forwards; }
+        .toast-icon { background: #2ecc71; color: white; width: 35px; height: 35px; display: flex; justify-content: center; align-items: center; border-radius: 50%; font-size: 18px; font-weight: bold; }
+        .toast-content { display: flex; flex-direction: column; }
+        .toast-title { font-size: 16px; color: #27ae60; font-weight: 800; margin-bottom: 2px; }
+        .toast-desc { font-size: 13px; color: #7f8c8d; font-weight: bold; }
+        
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(100%); } }
     </style>
 </head>
 <body>
@@ -106,6 +121,7 @@
     <!-- Sidebar Multi Color -->
     <div class="sidebar">
         <h2>Pradip</h2>
+        <button class="menu-btn btn-color-home active" onclick="showSection('welcome-screen', this)">🏠 Home</button>
         <button class="menu-btn btn-color-1" onclick="showSection('add-emp', this)">1. Add Employee</button>
         <button class="menu-btn btn-color-2" onclick="showSection('today-entry', this)">2. Today Entry</button>
         <button class="menu-btn btn-color-3" onclick="showSection('view-details', this)">3. View Details</button>
@@ -115,8 +131,8 @@
     <!-- Main Content -->
     <div class="main-content">
 
-        <!-- Default Welcome Screen -->
-        <div id="welcome-screen" class="section active welcome-container">
+        <!-- Welcome Screen (Only shows when Home is clicked) -->
+        <div id="welcome-screen" class="section active">
             <h1>Welcome to <span>Pradip</span></h1>
             <p>Employee Attendance Management System</p>
             <p style="margin-top: 20px; font-size: 1rem; color: #bdc3c7;">Please select an option from the dashboard menu to get started.</p>
@@ -224,11 +240,15 @@
         </div>
 
     </div>
+    
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container"></div>
 
     <script>
         // Data Initialization from LocalStorage
         let employees = JSON.parse(localStorage.getItem('pradip_employees')) || [];
         let attendance = JSON.parse(localStorage.getItem('pradip_attendance')) || {}; 
+        let editModes = {}; 
 
         // Setup max date for Today Entry
         const todayStr = new Date().toISOString().split('T')[0];
@@ -241,13 +261,8 @@
         document.getElementById('summaryMonth').value = currentMonthStr;
         document.getElementById('exportMonth').value = currentMonthStr;
 
-        // Navigation Logic (Welcome screen removed permanently on first click)
+        // Navigation Logic (Welcome screen is now kept in DOM and toggles perfectly)
         function showSection(sectionId, btnElement) {
-            const welcomeScreen = document.getElementById('welcome-screen');
-            if (welcomeScreen) {
-                welcomeScreen.remove();
-            }
-
             document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
             document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
             
@@ -255,11 +270,34 @@
             
             if(btnElement) {
                 btnElement.classList.add('active');
+            } else {
+                if (sectionId === 'welcome-screen') {
+                    document.querySelector('.btn-color-home').classList.add('active');
+                }
             }
 
             if(sectionId === 'today-entry') loadAttendanceList();
             if(sectionId === 'view-details') loadViewDetails();
             if(sectionId === 'download-data') generateExportTable();
+        }
+
+        // --- Toast Notification Logic ---
+        function showToast(statusText) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `
+                <div class="toast-icon">✓</div>
+                <div class="toast-content">
+                    <span class="toast-title">Done & Auto-Saved!</span>
+                    <span class="toast-desc">Marked as <b>${statusText}</b></span>
+                </div>
+            `;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 2000);
         }
 
         // --- Add / Edit Employee Logic ---
@@ -333,6 +371,11 @@
         }
 
         // --- Today Entry Logic ---
+        function enableEdit(empId) {
+            editModes[empId] = true; 
+            loadAttendanceList();
+        }
+
         function loadAttendanceList() {
             const date = document.getElementById('attendanceDate').value;
             document.getElementById('dateDisplay').innerText = `Date: ${date}`;
@@ -352,6 +395,30 @@
                 
                 const card = document.createElement('div');
                 card.className = 'att-card';
+                
+                let actionHTML = '';
+                
+                if(status && !editModes[emp.id]) {
+                    let statusClass = '';
+                    if(status === 'Present') statusClass = 'btn-present selected';
+                    if(status === 'Absent') statusClass = 'btn-absent selected';
+                    if(status === 'Half Day') statusClass = 'btn-half selected';
+                    if(status === 'Weekly Off') statusClass = 'btn-wo selected';
+
+                    actionHTML = `
+                        <button class="btn-att ${statusClass}" style="cursor: default;">${status} ✓</button>
+                        <button class="btn-att" style="background:#f39c12; color:white; border:none;" onclick="enableEdit('${emp.id}')">✏️ Edit</button>
+                    `;
+                } else {
+                    actionHTML = `
+                        <button class="btn-att btn-present ${status === 'Present' ? 'selected' : ''}" onclick="markAtt('${date}', '${emp.id}', 'Present')">Present</button>
+                        <button class="btn-att btn-absent ${status === 'Absent' ? 'selected' : ''}" onclick="markAtt('${date}', '${emp.id}', 'Absent')">Absent</button>
+                        <button class="btn-att btn-half ${status === 'Half Day' ? 'selected' : ''}" onclick="markAtt('${date}', '${emp.id}', 'Half Day')">Half Day</button>
+                        <button class="btn-att btn-wo ${status === 'Weekly Off' ? 'selected' : ''}" onclick="markAtt('${date}', '${emp.id}', 'Weekly Off')">Weekly Off</button>
+                        <button class="btn-att" style="background:#bdc3c7; color:#333;" onclick="markAtt('${date}', '${emp.id}', '')">Clear</button>
+                    `;
+                }
+
                 card.innerHTML = `
                     <div class="att-info">
                         <img src="${emp.photo || 'https://via.placeholder.com/50'}" alt="Photo">
@@ -361,11 +428,7 @@
                         </div>
                     </div>
                     <div class="att-actions">
-                        <button class="btn-att btn-present ${status === 'Present' ? 'selected' : ''}" onclick="markAtt('${date}', '${emp.id}', 'Present')">Present</button>
-                        <button class="btn-att btn-absent ${status === 'Absent' ? 'selected' : ''}" onclick="markAtt('${date}', '${emp.id}', 'Absent')">Absent</button>
-                        <button class="btn-att btn-half ${status === 'Half Day' ? 'selected' : ''}" onclick="markAtt('${date}', '${emp.id}', 'Half Day')">Half Day</button>
-                        <button class="btn-att btn-wo ${status === 'Weekly Off' ? 'selected' : ''}" onclick="markAtt('${date}', '${emp.id}', 'Weekly Off')">Weekly Off</button>
-                        <button class="btn-att" style="background:#bdc3c7; color:#333;" onclick="markAtt('${date}', '${emp.id}', '')">Clear</button>
+                        ${actionHTML}
                     </div>
                 `;
                 container.appendChild(card);
@@ -377,7 +440,9 @@
                 delete attendance[date][empId]; 
             } else {
                 attendance[date][empId] = status;
+                showToast(status); 
             }
+            editModes[empId] = false; 
             localStorage.setItem('pradip_attendance', JSON.stringify(attendance));
             loadAttendanceList(); 
         }
@@ -434,7 +499,6 @@
             table.innerHTML = '';
             table.style.borderCollapse = 'collapse';
 
-            // Generate Header with inline styles for Word & Excel
             let thead = `<thead>
                 <tr>
                     <th style="border:1px solid #333; padding:8px; background-color:#2c3e50; color:white; text-align:center;">Emp ID</th>
@@ -450,7 +514,6 @@
                 </tr>
             </thead>`;
             
-            // Generate Body with inline styles
             let tbody = '<tbody>';
             employees.forEach(emp => {
                 let row = `<tr>
@@ -489,7 +552,6 @@
             table.innerHTML = thead + tbody;
         }
 
-        // Updated Excel Export using HTML to XLS to keep styles intact
         function exportExcel() {
             const monthVal = document.getElementById('exportMonth').value;
             const tableHTML = document.getElementById('exportTableContainer').innerHTML;
