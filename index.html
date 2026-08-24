@@ -182,12 +182,13 @@
                         <label><b>Select Date:</b></label>
                         <input type="date" id="attendanceDate" class="form-control" style="width: auto; display: inline-block; margin-left:10px;" onchange="loadAttendanceList()">
                     </div>
-                    <!-- New Option 1: Next Day -->
+                    <!-- Option 1: Next Day -->
                     <button class="btn btn-primary" onclick="goToNextDay()" style="padding: 10px 15px; font-size: 14px; background-color: #3498db;">Next Day ➡️</button>
-                    <!-- New Option 2: Mark All Present -->
+                    <!-- Option 2: Mark All Present -->
                     <button class="btn" onclick="markAllPresentUntilDate()" style="padding: 10px 15px; font-size: 14px; background-color: #27ae60; color: white;">✓ Mark All Present (1st to Date)</button>
                 </div>
-                <span id="dateDisplay" style="font-weight: bold; color: #e74c3c; font-size: 18px;"></span>
+                <!-- Date and Day display updated here -->
+                <div id="dateDisplay" style="text-align: right; line-height: 1.4;"></div>
             </div>
             
             <div id="attendanceList">
@@ -376,7 +377,7 @@
             }
         }
 
-        // --- NEW LOGIC: Go To Next Day ---
+        // --- Next Day Logic ---
         function goToNextDay() {
             const dateInput = document.getElementById('attendanceDate');
             const currentVal = dateInput.value;
@@ -401,7 +402,7 @@
             loadAttendanceList();
         }
 
-        // --- NEW LOGIC: Mark All Present Until Date ---
+        // --- Mark All Present Logic ---
         function markAllPresentUntilDate() {
             if(employees.length === 0) {
                 alert("Please add employees first.");
@@ -435,17 +436,27 @@
             }
         }
 
-        // --- Today Entry Logic ---
+        // --- Today Entry Logic (Updated for Day Name) ---
         function enableEdit(empId) {
             editModes[empId] = true; 
             loadAttendanceList();
         }
 
         function loadAttendanceList() {
-            const date = document.getElementById('attendanceDate').value;
-            document.getElementById('dateDisplay').innerText = `Date: ${date}`;
+            const dateStr = document.getElementById('attendanceDate').value;
             
-            if(!attendance[date]) attendance[date] = {}; 
+            // Generate Day Name
+            const dateObj = new Date(dateStr);
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const dayName = days[dateObj.getDay()];
+
+            // Show Date and Day Name
+            document.getElementById('dateDisplay').innerHTML = `
+                <span style="font-weight: bold; color: #e74c3c; font-size: 18px;">Date: ${dateStr}</span><br>
+                <span style="font-weight: bold; color: #2c3e50; font-size: 14px;">Day: ${dayName}</span>
+            `;
+            
+            if(!attendance[dateStr]) attendance[dateStr] = {}; 
 
             const container = document.getElementById('attendanceList');
             container.innerHTML = '';
@@ -456,7 +467,7 @@
             }
 
             employees.forEach(emp => {
-                const status = attendance[date][emp.id] || '';
+                const status = attendance[dateStr][emp.id] || '';
                 
                 const card = document.createElement('div');
                 card.className = 'att-card';
@@ -476,11 +487,11 @@
                     `;
                 } else {
                     actionHTML = `
-                        <button class="btn-att btn-present ${status === 'Present' ? 'selected' : ''}" onclick="markAtt('${date}', '${emp.id}', 'Present')">Present</button>
-                        <button class="btn-att btn-absent ${status === 'Absent' ? 'selected' : ''}" onclick="markAtt('${date}', '${emp.id}', 'Absent')">Absent</button>
-                        <button class="btn-att btn-half ${status === 'Half Day' ? 'selected' : ''}" onclick="markAtt('${date}', '${emp.id}', 'Half Day')">Half Day</button>
-                        <button class="btn-att btn-wo ${status === 'Weekly Off' ? 'selected' : ''}" onclick="markAtt('${date}', '${emp.id}', 'Weekly Off')">Weekly Off</button>
-                        <button class="btn-att" style="background:#bdc3c7; color:#333;" onclick="markAtt('${date}', '${emp.id}', '')">Clear</button>
+                        <button class="btn-att btn-present ${status === 'Present' ? 'selected' : ''}" onclick="markAtt('${dateStr}', '${emp.id}', 'Present')">Present</button>
+                        <button class="btn-att btn-absent ${status === 'Absent' ? 'selected' : ''}" onclick="markAtt('${dateStr}', '${emp.id}', 'Absent')">Absent</button>
+                        <button class="btn-att btn-half ${status === 'Half Day' ? 'selected' : ''}" onclick="markAtt('${dateStr}', '${emp.id}', 'Half Day')">Half Day</button>
+                        <button class="btn-att btn-wo ${status === 'Weekly Off' ? 'selected' : ''}" onclick="markAtt('${dateStr}', '${emp.id}', 'Weekly Off')">Weekly Off</button>
+                        <button class="btn-att" style="background:#bdc3c7; color:#333;" onclick="markAtt('${dateStr}', '${emp.id}', '')">Clear</button>
                     `;
                 }
 
