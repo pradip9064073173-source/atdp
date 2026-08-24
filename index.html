@@ -32,7 +32,7 @@
         .btn-color-4 { background: linear-gradient(135deg, #e67e22, #d35400); }
         .btn-color-4:hover, .btn-color-4.active { background: linear-gradient(135deg, #d35400, #e67e22); transform: scale(1.05); box-shadow: 0 6px 12px rgba(230, 126, 34, 0.4); }
         
-        /* Main Content & Sections (Fixed Display Issue) */
+        /* Main Content & Sections */
         .main-content { flex-grow: 1; padding: 30px; overflow-y: auto; }
         .section { display: none; background: white; padding: 25px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         .section.active { display: block; animation: fadeIn 0.4s ease; }
@@ -40,7 +40,7 @@
         
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Welcome Screen Styling - Fixed to Only Show When Active */
+        /* Welcome Screen Styling */
         #welcome-screen { background: none; box-shadow: none; height: 80vh; }
         #welcome-screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
         #welcome-screen h1 { font-size: 3.5rem; color: #2c3e50; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
@@ -177,9 +177,15 @@
         <div id="today-entry" class="section">
             <h3>Attendance Entry</h3>
             <div class="top-filter">
-                <div>
-                    <label><b>Select Date:</b></label>
-                    <input type="date" id="attendanceDate" class="form-control" style="width: auto; display: inline-block; margin-left:10px;" onchange="loadAttendanceList()">
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <div>
+                        <label><b>Select Date:</b></label>
+                        <input type="date" id="attendanceDate" class="form-control" style="width: auto; display: inline-block; margin-left:10px;" onchange="loadAttendanceList()">
+                    </div>
+                    <!-- New Option 1: Next Day -->
+                    <button class="btn btn-primary" onclick="goToNextDay()" style="padding: 10px 15px; font-size: 14px; background-color: #3498db;">Next Day ➡️</button>
+                    <!-- New Option 2: Mark All Present -->
+                    <button class="btn" onclick="markAllPresentUntilDate()" style="padding: 10px 15px; font-size: 14px; background-color: #27ae60; color: white;">✓ Mark All Present (1st to Date)</button>
                 </div>
                 <span id="dateDisplay" style="font-weight: bold; color: #e74c3c; font-size: 18px;"></span>
             </div>
@@ -261,7 +267,7 @@
         document.getElementById('summaryMonth').value = currentMonthStr;
         document.getElementById('exportMonth').value = currentMonthStr;
 
-        // Navigation Logic (Welcome screen is now kept in DOM and toggles perfectly)
+        // Navigation Logic
         function showSection(sectionId, btnElement) {
             document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
             document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
@@ -367,6 +373,65 @@
                 employees.splice(index, 1);
                 localStorage.setItem('pradip_employees', JSON.stringify(employees));
                 loadViewDetails();
+            }
+        }
+
+        // --- NEW LOGIC: Go To Next Day ---
+        function goToNextDay() {
+            const dateInput = document.getElementById('attendanceDate');
+            const currentVal = dateInput.value;
+            if(!currentVal) return;
+            
+            let [y, m, d] = currentVal.split('-').map(Number);
+            let nextDate = new Date(y, m - 1, d + 1);
+            
+            let today = new Date();
+            today.setHours(0,0,0,0);
+            
+            if(nextDate > today) {
+                alert("Cannot select future dates.");
+                return;
+            }
+            
+            let ny = nextDate.getFullYear();
+            let nm = String(nextDate.getMonth() + 1).padStart(2, '0');
+            let nd = String(nextDate.getDate()).padStart(2, '0');
+            
+            dateInput.value = `${ny}-${nm}-${nd}`;
+            loadAttendanceList();
+        }
+
+        // --- NEW LOGIC: Mark All Present Until Date ---
+        function markAllPresentUntilDate() {
+            if(employees.length === 0) {
+                alert("Please add employees first.");
+                return;
+            }
+            
+            const selectedDateStr = document.getElementById('attendanceDate').value;
+            const [y, m, d] = selectedDateStr.split('-');
+            const maxDay = parseInt(d, 10);
+            
+            if(confirm(`Are you sure you want to mark all employees PRESENT from 1st to ${maxDay} of this month?`)) {
+                for(let i = 1; i <= maxDay; i++) {
+                    const dayStr = i < 10 ? '0' + i : i;
+                    const dateStr = `${y}-${m}-${dayStr}`;
+                    
+                    if(!attendance[dateStr]) attendance[dateStr] = {};
+                    
+                    employees.forEach(emp => {
+                        attendance[dateStr][emp.id] = 'Present';
+                    });
+                }
+                
+                // Clear any open edit modes
+                for(let empId in editModes) {
+                    editModes[empId] = false;
+                }
+                
+                localStorage.setItem('pradip_attendance', JSON.stringify(attendance));
+                loadAttendanceList();
+                showToast(`All Present (1st to ${maxDay})`);
             }
         }
 
